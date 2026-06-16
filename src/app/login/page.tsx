@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import Loader from '../../components/Loader';
 
 export default function LoginPage() {
   const [step, setStep] = useState<'email' | 'otp'>('email');
@@ -11,6 +12,7 @@ export default function LoginPage() {
   const [otp, setOtp] = useState('');
   const [isEntering, setIsEntering] = useState(true);
   const [isExiting, setIsExiting] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
   const router = useRouter();
 
@@ -28,11 +30,19 @@ export default function LoginPage() {
     }, 500);
   };
 
+  const proceedWithLoading = (nextAction: () => void) => {
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+      nextAction();
+    }, 1000);
+  };
+
   const handleGetOtp = (e: React.FormEvent) => {
     e.preventDefault();
     if (email.trim() !== '') {
       // In a real app, you would trigger the OTP API here
-      setStep('otp');
+      proceedWithLoading(() => setStep('otp'));
     }
   };
 
@@ -70,12 +80,13 @@ export default function LoginPage() {
     e.preventDefault();
     if (otp.trim() !== '') {
       // In a real app, verify OTP and login
-      alert(`Logging in with ${email} and OTP: ${otp}`);
+      proceedWithLoading(() => alert(`Logging in with ${email} and OTP: ${otp}`));
     }
   };
 
   return (
     <>
+      <Loader isVisible={isLoading} />
       <div className="h-screen w-full flex flex-col md:flex-row font-sans overflow-hidden relative bg-[#003973]">
       
       {/* Full Screen Gradient Background */}
