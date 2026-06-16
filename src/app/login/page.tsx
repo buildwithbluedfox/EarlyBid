@@ -215,7 +215,7 @@ export default function LoginPage() {
             </form>
 
             <p className="mt-8 text-center text-sm text-slate-500 opacity-0 animate-fade-in-up animation-delay-700">
-              Don&apos;t have an account? <a href="#" className="text-[#003973] font-semibold hover:underline">Sign up</a>
+              Don&apos;t have an account? <Link href="/signup" onClick={(e) => handleNavigation(e, '/signup')} className="text-[#003973] font-semibold hover:underline">Sign up</Link>
             </p>
           </div>
         </div>
