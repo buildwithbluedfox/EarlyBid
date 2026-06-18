@@ -19,6 +19,29 @@ export default function SignupPage() {
   const emailInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
+  // Memoize random star generation so they don't re-render on keystrokes
+  const desktopStars = React.useMemo(() => {
+    return [...Array(35)].map((_, i) => ({
+      id: i,
+      top: 35 + Math.random() * 30,
+      size: 2 + Math.random() * 4,
+      delay: -(Math.random() * 40),
+      duration: 20 + Math.random() * 20,
+      drift: (Math.random() - 0.5) * 60,
+    }));
+  }, []);
+
+  const mobileStars = React.useMemo(() => {
+    return [...Array(35)].map((_, i) => ({
+      id: i,
+      left: 35 + Math.random() * 30,
+      size: 2 + Math.random() * 4,
+      delay: -(Math.random() * 40),
+      duration: 20 + Math.random() * 20,
+      drift: (Math.random() - 0.5) * 60,
+    }));
+  }, []);
+
   useEffect(() => {
     // Small delay ensures the component renders the overlay first, then fades it out
     const timer = setTimeout(() => {
@@ -329,9 +352,6 @@ export default function SignupPage() {
               style={{ clipPath: 'polygon(0 42%, 100% 10%, 100% 90%, 0 58%)' }}
             ></div>
           </div>
-
-          {/* The Blinding Light Source */}
-          <div className="absolute left-0 h-[30%] w-[3px] bg-white shadow-[0_0_30px_10px_#4ba1fa] mix-blend-screen"></div>
         </div>
 
         {/* --- MOBILE BEAMS (Shooting Bottom to Top) --- */}
@@ -354,73 +374,56 @@ export default function SignupPage() {
               style={{ clipPath: 'polygon(10% 0, 90% 0, 58% 100%, 42% 100%)' }}
             ></div>
           </div>
-
-          {/* The Blinding Light Source */}
-          <div className="absolute bottom-0 w-[30%] h-[3px] bg-white shadow-[0_0_30px_10px_#4ba1fa] mix-blend-screen"></div>
         </div>
+
+
 
         {/* --- DESKTOP Flying Stars --- */}
         <div className="hidden md:block absolute inset-0 pointer-events-none z-10">
-          {[...Array(35)].map((_, i) => {
-            const top = 35 + Math.random() * 30; 
-            const size = 2 + Math.random() * 4; 
-            const delay = -(Math.random() * 40); // Negative delay so it starts populated
-            const duration = 20 + Math.random() * 20; // 20s to 40s total life
-            const drift = (Math.random() - 0.5) * 60; 
-            
-            return (
-              <div
-                key={`desktop-star-${i}`}
-                className="absolute left-0 text-white mix-blend-screen flex items-center justify-center opacity-0"
-                style={{
-                  top: `${top}%`,
-                  width: `${size}px`,
-                  height: `${size}px`,
-                  animation: `
-                    fly-transform-desktop ${duration}s cubic-bezier(0.5, 0, 1, 1) ${delay}s infinite,
-                    fly-opacity ${duration}s linear ${delay}s infinite
-                  `,
-                  '--drift': `${drift}vh`
-                } as React.CSSProperties}
-              >
-                <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
-                  <path d="M12 0C12 6.627 17.373 12 24 12C17.373 12 12 17.373 12 24C12 17.373 6.627 12 0 12C6.627 12 12 6.627 12 0Z" />
-                </svg>
-              </div>
-            );
-          })}
+          {desktopStars.map((star) => (
+            <div
+              key={`desktop-star-${star.id}`}
+              className="absolute left-0 text-white mix-blend-screen flex items-center justify-center opacity-0"
+              style={{
+                top: `${star.top}%`,
+                width: `${star.size}px`,
+                height: `${star.size}px`,
+                animation: `
+                  fly-transform-desktop ${star.duration}s cubic-bezier(0.5, 0, 1, 1) ${star.delay}s infinite,
+                  fly-opacity ${star.duration}s linear ${star.delay}s infinite
+                `,
+                '--drift': `${star.drift}vh`
+              } as React.CSSProperties}
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
+                <path d="M12 0C12 6.627 17.373 12 24 12C17.373 12 12 17.373 12 24C12 17.373 6.627 12 0 12C6.627 12 12 6.627 12 0Z" />
+              </svg>
+            </div>
+          ))}
         </div>
 
         {/* --- MOBILE Flying Stars --- */}
         <div className="md:hidden absolute inset-0 pointer-events-none z-10">
-          {[...Array(35)].map((_, i) => {
-            const left = 35 + Math.random() * 30; 
-            const size = 2 + Math.random() * 4; 
-            const delay = -(Math.random() * 40); 
-            const duration = 20 + Math.random() * 20; 
-            const drift = (Math.random() - 0.5) * 60; 
-            
-            return (
-              <div
-                key={`mobile-star-${i}`}
-                className="absolute bottom-0 text-white mix-blend-screen flex items-center justify-center opacity-0"
-                style={{
-                  left: `${left}%`,
-                  width: `${size}px`,
-                  height: `${size}px`,
-                  animation: `
-                    fly-transform-mobile ${duration}s cubic-bezier(0.5, 0, 1, 1) ${delay}s infinite,
-                    fly-opacity ${duration}s linear ${delay}s infinite
-                  `,
-                  '--drift': `${drift}vw`
-                } as React.CSSProperties}
-              >
-                <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
-                  <path d="M12 0C12 6.627 17.373 12 24 12C17.373 12 12 17.373 12 24C12 17.373 6.627 12 0 12C6.627 12 12 6.627 12 0Z" />
-                </svg>
-              </div>
-            );
-          })}
+          {mobileStars.map((star) => (
+            <div
+              key={`mobile-star-${star.id}`}
+              className="absolute bottom-0 text-white mix-blend-screen flex items-center justify-center opacity-0"
+              style={{
+                left: `${star.left}%`,
+                width: `${star.size}px`,
+                height: `${star.size}px`,
+                animation: `
+                  fly-transform-mobile ${star.duration}s cubic-bezier(0.5, 0, 1, 1) ${star.delay}s infinite,
+                  fly-opacity ${star.duration}s linear ${star.delay}s infinite
+                `,
+                '--drift': `${star.drift}vw`
+              } as React.CSSProperties}
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
+                <path d="M12 0C12 6.627 17.373 12 24 12C17.373 12 12 17.373 12 24C12 17.373 6.627 12 0 12C6.627 12 12 6.627 12 0Z" />
+              </svg>
+            </div>
+          ))}
         </div>
       </div>
       
